@@ -2,5 +2,5 @@
 
 module CIT
   # Version of the service
-  VERSION = '1.0.0'
+  VERSION = '0.0.0'
 end
