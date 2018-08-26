@@ -1,0 +1,16 @@
+---
+default: &default
+  adapter: postgres
+  user: <%= ENV['CIT_DB_USER'] %>
+  password: "<%= ENV['CIT_DB_PASS'] %>"
+  host: <%= ENV['CIT_DB_HOST'] %>
+  database: <%= ENV['CIT_DB_NAME'] %>
+
+development:
+  <<: *default
+
+production:
+  <<: *default
+
+test:
+  <<: *default
