@@ -24,6 +24,7 @@ module CIT
     #   @return [Time]
     #     dand time of record creation
     class MadScientist < Sequel::Model
+      unrestrict_primary_key
     end
   end
 end

@@ -24,6 +24,7 @@ module CIT
     #   @return [String]
     #     identifier of the owner's record
     class DoomsdayMachine < Sequel::Model
+      unrestrict_primary_key
     end
   end
 end
