@@ -15,6 +15,9 @@ module CIT
           def self.registered(controller)
             # Creates new record of a mad scientist and returns information
             # about the record
+            # @param [Hash] params
+            #   associative array with structure described in
+            #   {Actions::MadScientists::Create::PARAMS_SCHEMA JSON-schema}
             # @return [Hash]
             #   associative array with structure described in
             #   {Actions::MadScientists::Create::RESULT_SCHEMA JSON-schema}
