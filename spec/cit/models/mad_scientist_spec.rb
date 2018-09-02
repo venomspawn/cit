@@ -184,7 +184,7 @@ RSpec.describe CIT::Models::MadScientist do
   describe 'instance of the model' do
     subject(:instance) { create(:mad_scientist) }
 
-    messages = %i[id name madness tries created_at update]
+    messages = %i[id name madness tries created_at update destroy]
     it { is_expected.to respond_to(*messages) }
   end
 
@@ -446,6 +446,26 @@ RSpec.describe CIT::Models::MadScientist do
         it 'should raise Sequel::InvalidValue' do
           expect { subject }.to raise_error(Sequel::InvalidValue)
         end
+      end
+    end
+  end
+
+  describe '#destroy' do
+    subject { instance.destroy }
+
+    let!(:instance) { create(:mad_scientist) }
+
+    it 'should destroy the record' do
+      expect { subject }.to change { CIT::Models::MadScientist.count }.by(-1)
+    end
+
+    context 'when there is a record of a doomsday machine of the scientist' do
+      let!(:doomsday_machine) { create(:doomsday_machine, traits) }
+      let(:traits) { { mad_scientist_id: instance.id } }
+
+      it 'should raise Sequel::ForeignKeyConstraintViolation' do
+        expect { subject }
+          .to raise_error(Sequel::ForeignKeyConstraintViolation)
       end
     end
   end
