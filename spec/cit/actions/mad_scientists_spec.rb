@@ -6,7 +6,7 @@ RSpec.describe CIT::Actions::MadScientists do
   describe 'the module' do
     subject { described_class }
 
-    it { is_expected.to respond_to(:create, :destroy) }
+    it { is_expected.to respond_to(:create, :destroy, :index) }
   end
 
   describe '.create' do
@@ -61,6 +61,106 @@ RSpec.describe CIT::Actions::MadScientists do
       it 'should raise Sequel::ForeignKeyConstraintViolation' do
         expect { subject }
           .to raise_error(Sequel::ForeignKeyConstraintViolation)
+      end
+    end
+  end
+
+  describe '.index' do
+    include described_class::Index::SpecHelper
+
+    subject(:result) { described_class.index(params, rest) }
+
+    let(:params) { data }
+    let(:data) { {} }
+    let(:rest) { nil }
+    let!(:mad_scientists) { create_mad_scientists }
+
+    it_should_behave_like 'an action parameters receiver',
+                          wrong_structure: { page: 'wrong' }
+
+    describe 'result' do
+      subject { result }
+
+      it { is_expected.to match_json_schema(schema) }
+
+      describe 'size' do
+        subject { result.size }
+
+        context 'when `page_size` parameter value is provided' do
+          let(:params) { { page_size: page_size } }
+          let(:page_size) { 2 }
+
+          it 'should be less than the value or equal it' do
+            expect(subject).to be <= page_size
+          end
+        end
+
+        context 'when `page_size` parameter value is not provided' do
+          value = 'CIT::Actions::MadScientists::Index::DEFAULT_PAGE_SIZE'
+          it "should be less than #{value} or equal it" do
+            expect(subject).to be <= described_class::Index::DEFAULT_PAGE_SIZE
+          end
+        end
+      end
+
+      describe 'order' do
+        context 'when `order` parameter value is a column name' do
+          context 'when `direction` parameter value is absent' do
+            let(:params) { { order: :name } }
+
+            it 'should be ordered by values of the column ascending' do
+              expect(result.map { |hash| hash[:name] })
+                .to be == mad_scientists.map(&:name).sort
+            end
+          end
+
+          context 'when `direction` parameter value is `asc`' do
+            let(:params) { { order: :name, direction: :asc } }
+
+            it 'should be ordered by values of the column ascending' do
+              expect(result.map { |hash| hash[:name] })
+                .to be == mad_scientists.map(&:name).sort
+            end
+          end
+
+          context 'when `direction` parameter value is `desc`' do
+            let(:params) { { order: :name, direction: :desc } }
+
+            it 'should be ordered by values of the column descending' do
+              expect(result.map { |hash| hash[:name] })
+                .to be == mad_scientists.map(&:name).sort.reverse
+            end
+          end
+        end
+
+        context 'when `order` parameter value is absent' do
+          context 'when `direction` parameter value is absent' do
+            let(:params) { {} }
+
+            it 'should be ordered by values of `id` column ascending' do
+              expect(result.map { |hash| hash[:id] })
+                .to be == mad_scientists.map(&:id).sort
+            end
+          end
+
+          context 'when `direction` parameter value is `asc`' do
+            let(:params) { { direction: :asc } }
+
+            it 'should be ordered by values of `id` column ascending' do
+              expect(result.map { |hash| hash[:id] })
+                .to be == mad_scientists.map(&:id).sort
+            end
+          end
+
+          context 'when `direction` parameter value is `desc`' do
+            let(:params) { { direction: :desc } }
+
+            it 'should be ordered by values of `id` column descending' do
+              expect(result.map { |hash| hash[:id] })
+                .to be == mad_scientists.map(&:id).sort.reverse
+            end
+          end
+        end
       end
     end
   end
