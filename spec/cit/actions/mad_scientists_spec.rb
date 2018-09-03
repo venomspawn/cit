@@ -6,7 +6,7 @@ RSpec.describe CIT::Actions::MadScientists do
   describe 'the module' do
     subject { described_class }
 
-    it { is_expected.to respond_to(:create, :destroy, :index, :show) }
+    it { is_expected.to respond_to(:create, :destroy, :index, :show, :update) }
   end
 
   describe '.create' do
@@ -182,6 +182,36 @@ RSpec.describe CIT::Actions::MadScientists do
       subject { result }
 
       it { is_expected.to match_json_schema(schema) }
+    end
+
+    context 'when the record can\'t be found by provided identifier' do
+      let(:id) { create(:uuid) }
+
+      it 'should raise Sequel::NoMatchingRow' do
+        expect { subject }.to raise_error(Sequel::NoMatchingRow)
+      end
+    end
+  end
+
+  describe '.update' do
+    subject { described_class.update(params, rest) }
+
+    let(:params) { data }
+    let(:data) { { id: id, **update_params } }
+    let(:id) { mad_scientist.id }
+    let(:mad_scientist) { create(:mad_scientist) }
+    let(:update_params) { attributes_for(:mad_scientist).except(*columns) }
+    let(:columns) { %i[id created_at] }
+    let(:rest) { nil }
+
+    it_should_behave_like 'an action parameters receiver', wrong_structure: {}
+
+    it 'should update fields of record of the mad scientist' do
+      subject
+      mad_scientist.reload
+      expect(mad_scientist.name).to be == update_params[:name]
+      expect(mad_scientist.madness).to be == update_params[:madness]
+      expect(mad_scientist.tries).to be == update_params[:tries]
     end
 
     context 'when the record can\'t be found by provided identifier' do

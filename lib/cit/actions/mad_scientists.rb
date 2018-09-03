@@ -63,6 +63,19 @@ module CIT
       def self.show(params, rest = nil)
         Show.new(params, rest).show
       end
+
+      require_relative 'mad_scientists/update'
+
+      # Updates information on a mad scientist
+      # @param [Object] params
+      #   object of action parameters, which can be an associative array, a
+      #   JSON-string or an object with `#read` method
+      # @param [NilClass, Hash] rest
+      #   associative array of additional action parameters or `nil`, if
+      #   there are no additional parameters
+      def self.update(params, rest = nil)
+        Update.new(params, rest).update
+      end
     end
   end
 end
