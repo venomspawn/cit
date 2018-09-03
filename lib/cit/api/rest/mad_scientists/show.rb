@@ -12,11 +12,11 @@ module CIT
           #   REST API controller
           def self.registered(controller)
             # Returns information on a mad scientist
-            # @param [Hash] params
-            #   associative array with structure described in
+            # @param [String] request_body
+            #   JSON-string of structure described in
             #   {Actions::MadScientists::Show::PARAMS_SCHEMA JSON-schema}
-            # @return [Array]
-            #   array with structure described in
+            # @return [String]
+            #   JSON-string of structure described in
             #   {Actions::MadScientists::Show::RESULT_SCHEMA JSON-schema}
             # @return [Status]
             #   200
