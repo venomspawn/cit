@@ -26,7 +26,7 @@ RSpec.describe CIT::Actions::MadScientists do
       it { is_expected.to match_json_schema(schema) }
     end
 
-    it 'should create new record of mad scientists' do
+    it 'should create new record of mad scientist' do
       expect { subject }.to change { CIT::Models::MadScientist.count }.by(1)
     end
   end
