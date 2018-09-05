@@ -205,4 +205,32 @@ RSpec.describe CIT::Actions::DoomsdayMachines do
       end
     end
   end
+
+  describe '.update' do
+    subject { described_class.update(params, rest) }
+
+    let(:params) { data }
+    let(:data) { { id: id, **update_params } }
+    let(:id) { doomsday_machine.id }
+    let(:doomsday_machine) { create(:doomsday_machine) }
+    let(:update_params) { { name: create(:string), power: create(:integer) } }
+    let(:rest) { nil }
+
+    it_should_behave_like 'an action parameters receiver', wrong_structure: {}
+
+    it 'should update fields of record of the mad scientist' do
+      subject
+      doomsday_machine.reload
+      expect(doomsday_machine.name).to be == update_params[:name]
+      expect(doomsday_machine.power).to be == update_params[:power]
+    end
+
+    context 'when the record can\'t be found by provided identifier' do
+      let(:id) { create(:uuid) }
+
+      it 'should raise Sequel::NoMatchingRow' do
+        expect { subject }.to raise_error(Sequel::NoMatchingRow)
+      end
+    end
+  end
 end
