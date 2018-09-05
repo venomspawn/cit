@@ -32,6 +32,21 @@ module CIT
       def self.destroy(params, rest = nil)
         Destroy.new(params, rest).destroy
       end
+
+      require_relative 'doomsday_machines/index'
+
+      # Extracts and returns array with information on doomsday machines
+      # @param [Object] params
+      #   object of action parameters, which can be an associative array, a
+      #   JSON-string or an object with `#read` method
+      # @param [NilClass, Hash] rest
+      #   associative array of additional action parameters or `nil`, if
+      #   there are no additional parameters
+      # @return [Array]
+      #   resulting array
+      def self.index(params, rest = nil)
+        Index.new(params, rest).index
+      end
     end
   end
 end
