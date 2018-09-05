@@ -17,24 +17,12 @@ RSpec.describe CIT::Models::MadScientist do
 
       it { is_expected.to be_an_instance_of(described_class) }
     end
-
-    context 'when `params` contains `id` attribute' do
-      let(:params) { attributes_for(:mad_scientist) }
-
-      it 'should raise Sequel::MassAssignmentRestriction' do
-        expect { subject }.to raise_error(Sequel::MassAssignmentRestriction)
-      end
-    end
   end
 
   describe '.create' do
     subject(:result) { described_class.create(params) }
 
     describe 'result' do
-      before { described_class.unrestrict_primary_key }
-
-      after { described_class.restrict_primary_key }
-
       subject { result }
 
       let(:params) { attributes_for(:mad_scientist) }
@@ -42,15 +30,7 @@ RSpec.describe CIT::Models::MadScientist do
       it { is_expected.to be_a(described_class) }
     end
 
-    context 'when `params` contains `id` attribute' do
-      let(:params) { attributes_for(:mad_scientist) }
-
-      it 'should raise Sequel::MassAssignmentRestriction' do
-        expect { subject }.to raise_error(Sequel::MassAssignmentRestriction)
-      end
-    end
-
-    context 'when `params` doesn\'t contain `id` attribute' do
+    context 'when `params` doesn\'t contain `id` property' do
       let(:params) { attributes_for(:mad_scientist).except(:id) }
 
       it 'should raise Sequel::NotNullConstraintViolation' do
@@ -58,134 +38,144 @@ RSpec.describe CIT::Models::MadScientist do
       end
     end
 
-    context 'when primary key is unrestricted' do
-      before { described_class.unrestrict_primary_key }
+    context 'when value of `id` property is nil' do
+      let(:params) { attributes_for(:mad_scientist, id: value) }
+      let(:value) { nil }
 
-      after { described_class.restrict_primary_key }
+      it 'should raise Sequel::InvalidValue' do
+        expect { subject }.to raise_error(Sequel::InvalidValue)
+      end
+    end
 
-      context 'when value of `id` property is nil' do
+    context 'when value of `id` property is of String' do
+      context 'when the value is not of UUID format' do
         let(:params) { attributes_for(:mad_scientist, id: value) }
-        let(:value) { nil }
+        let(:value) { 'not of UUID format' }
 
-        it 'should raise Sequel::InvalidValue' do
-          expect { subject }.to raise_error(Sequel::InvalidValue)
+        it 'should raise Sequel::DatabaseError' do
+          expect { subject }.to raise_error(Sequel::DatabaseError)
         end
       end
+    end
 
-      context 'when value of `id` property is of String' do
-        context 'when the value is not of UUID format' do
-          let(:params) { attributes_for(:mad_scientist, id: value) }
-          let(:value) { 'not of UUID format' }
+    context 'when `params` doesn\'t contain `name` property' do
+      let(:params) { attributes_for(:mad_scientist).except(:name) }
 
-          it 'should raise Sequel::DatabaseError' do
-            expect { subject }.to raise_error(Sequel::DatabaseError)
-          end
-        end
+      it 'should raise Sequel::NotNullConstraintViolation' do
+        expect { subject }.to raise_error(Sequel::NotNullConstraintViolation)
       end
+    end
 
-      context 'when value of `name` property is nil' do
-        let(:params) { attributes_for(:mad_scientist, name: value) }
-        let(:value) { nil }
+    context 'when value of `name` property is nil' do
+      let(:params) { attributes_for(:mad_scientist, name: value) }
+      let(:value) { nil }
 
-        it 'should raise Sequel::InvalidValue' do
-          expect { subject }.to raise_error(Sequel::InvalidValue)
-        end
+      it 'should raise Sequel::InvalidValue' do
+        expect { subject }.to raise_error(Sequel::InvalidValue)
       end
+    end
 
-      context 'when value of `madness` property is nil' do
+    context 'when value of `madness` property is nil' do
+      let(:params) { attributes_for(:mad_scientist, madness: value) }
+      let(:value) { nil }
+
+      it 'should raise Sequel::InvalidValue' do
+        expect { subject }.to raise_error(Sequel::InvalidValue)
+      end
+    end
+
+    context 'when value of `madness` property is a negative number' do
+      let(:params) { attributes_for(:mad_scientist, madness: value) }
+      let(:value) { -1 }
+
+      it 'should raise Sequel::CheckConstraintViolation' do
+        expect { subject }.to raise_error(Sequel::CheckConstraintViolation)
+      end
+    end
+
+    context 'when value of `madness` property is of String' do
+      context 'when the value is not a number\'s representation' do
         let(:params) { attributes_for(:mad_scientist, madness: value) }
-        let(:value) { nil }
+        let(:value) { 'not a number\'s representation' }
 
         it 'should raise Sequel::InvalidValue' do
           expect { subject }.to raise_error(Sequel::InvalidValue)
         end
       end
 
-      context 'when value of `madness` property is a negative number' do
+      context 'when the value is a negative number\'s representation' do
         let(:params) { attributes_for(:mad_scientist, madness: value) }
-        let(:value) { -1 }
+        let(:value) { '-1' }
 
         it 'should raise Sequel::CheckConstraintViolation' do
           expect { subject }.to raise_error(Sequel::CheckConstraintViolation)
         end
       end
+    end
 
-      context 'when value of `madness` property is of String' do
-        context 'when the value is not a number\'s representation' do
-          let(:params) { attributes_for(:mad_scientist, madness: value) }
-          let(:value) { 'not a number\'s representation' }
+    context 'when value of `tries` property is nil' do
+      let(:params) { attributes_for(:mad_scientist, tries: value) }
+      let(:value) { nil }
 
-          it 'should raise Sequel::InvalidValue' do
-            expect { subject }.to raise_error(Sequel::InvalidValue)
-          end
-        end
-
-        context 'when the value is a negative number\'s representation' do
-          let(:params) { attributes_for(:mad_scientist, madness: value) }
-          let(:value) { '-1' }
-
-          it 'should raise Sequel::CheckConstraintViolation' do
-            expect { subject }.to raise_error(Sequel::CheckConstraintViolation)
-          end
-        end
+      it 'should raise Sequel::InvalidValue' do
+        expect { subject }.to raise_error(Sequel::InvalidValue)
       end
+    end
 
-      context 'when value of `tries` property is nil' do
+    context 'when value of `tries` property is a negative number' do
+      let(:params) { attributes_for(:mad_scientist, tries: value) }
+      let(:value) { -1 }
+
+      it 'should raise Sequel::CheckConstraintViolation' do
+        expect { subject }.to raise_error(Sequel::CheckConstraintViolation)
+      end
+    end
+
+    context 'when value of `tries` property is of String' do
+      context 'when the value is not a number\'s representation' do
         let(:params) { attributes_for(:mad_scientist, tries: value) }
-        let(:value) { nil }
+        let(:value) { 'not a number\'s representation' }
 
         it 'should raise Sequel::InvalidValue' do
           expect { subject }.to raise_error(Sequel::InvalidValue)
         end
       end
 
-      context 'when value of `tries` property is a negative number' do
+      context 'when the value is a negative number\'s representation' do
         let(:params) { attributes_for(:mad_scientist, tries: value) }
-        let(:value) { -1 }
+        let(:value) { '-1' }
 
         it 'should raise Sequel::CheckConstraintViolation' do
           expect { subject }.to raise_error(Sequel::CheckConstraintViolation)
         end
       end
+    end
 
-      context 'when value of `tries` property is of String' do
-        context 'when the value is not a number\'s representation' do
-          let(:params) { attributes_for(:mad_scientist, tries: value) }
-          let(:value) { 'not a number\'s representation' }
+    context 'when `params` doesn\'t contain `created_at` property' do
+      let(:params) { attributes_for(:mad_scientist).except(:created_at) }
 
-          it 'should raise Sequel::InvalidValue' do
-            expect { subject }.to raise_error(Sequel::InvalidValue)
-          end
-        end
-
-        context 'when the value is a negative number\'s representation' do
-          let(:params) { attributes_for(:mad_scientist, tries: value) }
-          let(:value) { '-1' }
-
-          it 'should raise Sequel::CheckConstraintViolation' do
-            expect { subject }.to raise_error(Sequel::CheckConstraintViolation)
-          end
-        end
+      it 'should raise Sequel::NotNullConstraintViolation' do
+        expect { subject }.to raise_error(Sequel::NotNullConstraintViolation)
       end
+    end
 
-      context 'when value of `created_at` property is nil' do
-        let(:params) { attributes_for(:mad_scientist, created_at: value) }
-        let(:value) { nil }
+    context 'when value of `created_at` property is nil' do
+      let(:params) { attributes_for(:mad_scientist, created_at: value) }
+      let(:value) { nil }
+
+      it 'should raise Sequel::InvalidValue' do
+        expect { subject }.to raise_error(Sequel::InvalidValue)
+      end
+    end
+
+    context 'when value of `created_at` property is of String' do
+      context 'when the value is not a time\'s representation' do
+        let(:params) { attributes_for(:mad_scientist, traits) }
+        let(:traits) { { created_at: value } }
+        let(:value) { 'not a time\'s representation' }
 
         it 'should raise Sequel::InvalidValue' do
           expect { subject }.to raise_error(Sequel::InvalidValue)
-        end
-      end
-
-      context 'when value of `created_at` property is of String' do
-        context 'when the value is not a time\'s representation' do
-          let(:params) { attributes_for(:mad_scientist, traits) }
-          let(:traits) { { created_at: value } }
-          let(:value) { 'not a time\'s representation' }
-
-          it 'should raise Sequel::InvalidValue' do
-            expect { subject }.to raise_error(Sequel::InvalidValue)
-          end
         end
       end
     end
@@ -194,7 +184,7 @@ RSpec.describe CIT::Models::MadScientist do
   describe 'instance of the model' do
     subject(:instance) { create(:mad_scientist) }
 
-    messages = %i[id name madness tries created_at update]
+    messages = %i[id name madness tries created_at update destroy]
     it { is_expected.to respond_to(*messages) }
   end
 
@@ -265,14 +255,6 @@ RSpec.describe CIT::Models::MadScientist do
     subject(:result) { instance.update(params) }
 
     let(:instance) { create(:mad_scientist) }
-
-    context 'when id is specified' do
-      let(:params) { { id: create(:uuid) } }
-
-      it 'should raise Sequel::MassAssignmentRestriction' do
-        expect { subject }.to raise_error(Sequel::MassAssignmentRestriction)
-      end
-    end
 
     context 'when `name` property is present in parameters' do
       let(:params) { { name: value } }
@@ -464,6 +446,26 @@ RSpec.describe CIT::Models::MadScientist do
         it 'should raise Sequel::InvalidValue' do
           expect { subject }.to raise_error(Sequel::InvalidValue)
         end
+      end
+    end
+  end
+
+  describe '#destroy' do
+    subject { instance.destroy }
+
+    let!(:instance) { create(:mad_scientist) }
+
+    it 'should destroy the record' do
+      expect { subject }.to change { CIT::Models::MadScientist.count }.by(-1)
+    end
+
+    context 'when there is a record of a doomsday machine of the scientist' do
+      let!(:doomsday_machine) { create(:doomsday_machine, traits) }
+      let(:traits) { { mad_scientist_id: instance.id } }
+
+      it 'should raise Sequel::ForeignKeyConstraintViolation' do
+        expect { subject }
+          .to raise_error(Sequel::ForeignKeyConstraintViolation)
       end
     end
   end

@@ -17,24 +17,12 @@ RSpec.describe CIT::Models::DoomsdayMachine do
 
       it { is_expected.to be_an_instance_of(described_class) }
     end
-
-    context 'when `params` contains `id` attribute' do
-      let(:params) { attributes_for(:doomsday_machine) }
-
-      it 'should raise Sequel::MassAssignmentRestriction' do
-        expect { subject }.to raise_error(Sequel::MassAssignmentRestriction)
-      end
-    end
   end
 
   describe '.create' do
     subject(:result) { described_class.create(params) }
 
     describe 'result' do
-      before { described_class.unrestrict_primary_key }
-
-      after { described_class.restrict_primary_key }
-
       subject { result }
 
       let(:params) { attributes_for(:doomsday_machine) }
@@ -42,15 +30,7 @@ RSpec.describe CIT::Models::DoomsdayMachine do
       it { is_expected.to be_a(described_class) }
     end
 
-    context 'when `params` contains `id` attribute' do
-      let(:params) { attributes_for(:doomsday_machine) }
-
-      it 'should raise Sequel::MassAssignmentRestriction' do
-        expect { subject }.to raise_error(Sequel::MassAssignmentRestriction)
-      end
-    end
-
-    context 'when `params` doesn\'t contain `id` attribute' do
+    context 'when `params` doesn\'t contain `id` property' do
       let(:params) { attributes_for(:doomsday_machine).except(:id) }
 
       it 'should raise Sequel::NotNullConstraintViolation' do
@@ -58,118 +38,128 @@ RSpec.describe CIT::Models::DoomsdayMachine do
       end
     end
 
-    context 'when primary key is unrestricted' do
-      before { described_class.unrestrict_primary_key }
+    context 'when value of `id` property is nil' do
+      let(:params) { attributes_for(:doomsday_machine, id: value) }
+      let(:value) { nil }
 
-      after { described_class.restrict_primary_key }
+      it 'should raise Sequel::InvalidValue' do
+        expect { subject }.to raise_error(Sequel::InvalidValue)
+      end
+    end
 
-      context 'when value of `id` property is nil' do
+    context 'when value of `id` property is of String' do
+      context 'when the value is not of UUID format' do
         let(:params) { attributes_for(:doomsday_machine, id: value) }
-        let(:value) { nil }
+        let(:value) { 'not of UUID format' }
 
-        it 'should raise Sequel::InvalidValue' do
-          expect { subject }.to raise_error(Sequel::InvalidValue)
+        it 'should raise Sequel::DatabaseError' do
+          expect { subject }.to raise_error(Sequel::DatabaseError)
         end
       end
+    end
 
-      context 'when value of `id` property is of String' do
-        context 'when the value is not of UUID format' do
-          let(:params) { attributes_for(:doomsday_machine, id: value) }
-          let(:value) { 'not of UUID format' }
+    context 'when `params` doesn\'t contain `name` property' do
+      let(:params) { attributes_for(:doomsday_machine).except(:name) }
 
-          it 'should raise Sequel::DatabaseError' do
-            expect { subject }.to raise_error(Sequel::DatabaseError)
-          end
-        end
+      it 'should raise Sequel::NotNullConstraintViolation' do
+        expect { subject }.to raise_error(Sequel::NotNullConstraintViolation)
       end
+    end
 
-      context 'when value of `name` property is nil' do
-        let(:params) { attributes_for(:doomsday_machine, name: value) }
-        let(:value) { nil }
+    context 'when value of `name` property is nil' do
+      let(:params) { attributes_for(:doomsday_machine, name: value) }
+      let(:value) { nil }
 
-        it 'should raise Sequel::InvalidValue' do
-          expect { subject }.to raise_error(Sequel::InvalidValue)
-        end
+      it 'should raise Sequel::InvalidValue' do
+        expect { subject }.to raise_error(Sequel::InvalidValue)
       end
+    end
 
-      context 'when value of `power` property is nil' do
+    context 'when value of `power` property is nil' do
+      let(:params) { attributes_for(:doomsday_machine, power: value) }
+      let(:value) { nil }
+
+      it 'should raise Sequel::InvalidValue' do
+        expect { subject }.to raise_error(Sequel::InvalidValue)
+      end
+    end
+
+    context 'when value of `power` property is a negative number' do
+      let(:params) { attributes_for(:doomsday_machine, power: value) }
+      let(:value) { -1 }
+
+      it 'should raise Sequel::CheckConstraintViolation' do
+        expect { subject }.to raise_error(Sequel::CheckConstraintViolation)
+      end
+    end
+
+    context 'when value of `power` property is of String' do
+      context 'when the value is not a number\'s representation' do
         let(:params) { attributes_for(:doomsday_machine, power: value) }
-        let(:value) { nil }
+        let(:value) { 'not a number\'s representation' }
 
         it 'should raise Sequel::InvalidValue' do
           expect { subject }.to raise_error(Sequel::InvalidValue)
         end
       end
 
-      context 'when value of `power` property is a negative number' do
+      context 'when the value is a negative number\'s representation' do
         let(:params) { attributes_for(:doomsday_machine, power: value) }
-        let(:value) { -1 }
+        let(:value) { '-1' }
 
         it 'should raise Sequel::CheckConstraintViolation' do
           expect { subject }.to raise_error(Sequel::CheckConstraintViolation)
         end
       end
+    end
 
-      context 'when value of `power` property is of String' do
-        context 'when the value is not a number\'s representation' do
-          let(:params) { attributes_for(:doomsday_machine, power: value) }
-          let(:value) { 'not a number\'s representation' }
+    context 'when `params` doesn\'t contain `created_at` property' do
+      let(:params) { attributes_for(:doomsday_machine).except(:created_at) }
 
-          it 'should raise Sequel::InvalidValue' do
-            expect { subject }.to raise_error(Sequel::InvalidValue)
-          end
-        end
-
-        context 'when the value is a negative number\'s representation' do
-          let(:params) { attributes_for(:doomsday_machine, power: value) }
-          let(:value) { '-1' }
-
-          it 'should raise Sequel::CheckConstraintViolation' do
-            expect { subject }.to raise_error(Sequel::CheckConstraintViolation)
-          end
-        end
+      it 'should raise Sequel::NotNullConstraintViolation' do
+        expect { subject }.to raise_error(Sequel::NotNullConstraintViolation)
       end
+    end
 
-      context 'when value of `created_at` property is nil' do
-        let(:params) { attributes_for(:doomsday_machine, created_at: value) }
-        let(:value) { nil }
+    context 'when value of `created_at` property is nil' do
+      let(:params) { attributes_for(:doomsday_machine, created_at: value) }
+      let(:value) { nil }
+
+      it 'should raise Sequel::InvalidValue' do
+        expect { subject }.to raise_error(Sequel::InvalidValue)
+      end
+    end
+
+    context 'when value of `created_at` property is of String' do
+      context 'when the value is not a time\'s representation' do
+        let(:params) { attributes_for(:doomsday_machine, traits) }
+        let(:traits) { { created_at: value } }
+        let(:value) { 'not a time\'s representation' }
 
         it 'should raise Sequel::InvalidValue' do
           expect { subject }.to raise_error(Sequel::InvalidValue)
         end
       end
+    end
 
-      context 'when value of `created_at` property is of String' do
-        context 'when the value is not a time\'s representation' do
-          let(:params) { attributes_for(:doomsday_machine, traits) }
-          let(:traits) { { created_at: value } }
-          let(:value) { 'not a time\'s representation' }
+    context 'when value of `mad_scientist_id` property is nil' do
+      let(:params) { attributes_for(:doomsday_machine, traits) }
+      let(:traits) { { mad_scientist_id: value } }
+      let(:value) { nil }
 
-          it 'should raise Sequel::InvalidValue' do
-            expect { subject }.to raise_error(Sequel::InvalidValue)
-          end
-        end
+      it 'should raise Sequel::InvalidValue' do
+        expect { subject }.to raise_error(Sequel::InvalidValue)
       end
+    end
 
-      context 'when value of `mad_scientist_id` property is nil' do
-        let(:params) { attributes_for(:doomsday_machine, traits) }
-        let(:traits) { { mad_scientist_id: value } }
-        let(:value) { nil }
+    context 'when value of `mad_scientist_id` is not a primary key' do
+      let(:params) { attributes_for(:doomsday_machine, traits) }
+      let(:traits) { { mad_scientist_id: value } }
+      let(:value) { create(:uuid) }
 
-        it 'should raise Sequel::InvalidValue' do
-          expect { subject }.to raise_error(Sequel::InvalidValue)
-        end
-      end
-
-      context 'when value of `mad_scientist_id` is not a primary key' do
-        let(:params) { attributes_for(:doomsday_machine, traits) }
-        let(:traits) { { mad_scientist_id: value } }
-        let(:value) { create(:uuid) }
-
-        it 'should raise Sequel::ForeignKeyConstraintViolation' do
-          expect { subject }
-            .to raise_error(Sequel::ForeignKeyConstraintViolation)
-        end
+      it 'should raise Sequel::ForeignKeyConstraintViolation' do
+        expect { subject }
+          .to raise_error(Sequel::ForeignKeyConstraintViolation)
       end
     end
   end
@@ -248,14 +238,6 @@ RSpec.describe CIT::Models::DoomsdayMachine do
     subject(:result) { instance.update(params) }
 
     let(:instance) { create(:doomsday_machine) }
-
-    context 'when id is specified' do
-      let(:params) { { id: create(:uuid) } }
-
-      it 'should raise Sequel::MassAssignmentRestriction' do
-        expect { subject }.to raise_error(Sequel::MassAssignmentRestriction)
-      end
-    end
 
     context 'when `name` property is present in parameters' do
       let(:params) { { name: value } }
