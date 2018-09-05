@@ -47,6 +47,22 @@ module CIT
       def self.index(params, rest = nil)
         Index.new(params, rest).index
       end
+
+      require_relative 'doomsday_machines/show'
+
+      # Extracts and returns associative array with information on doomsday
+      # machine
+      # @param [Object] params
+      #   object of action parameters, which can be an associative array, a
+      #   JSON-string or an object with `#read` method
+      # @param [NilClass, Hash] rest
+      #   associative array of additional action parameters or `nil`, if
+      #   there are no additional parameters
+      # @return [Hash]
+      #   resulting associative array
+      def self.show(params, rest = nil)
+        Show.new(params, rest).show
+      end
     end
   end
 end
