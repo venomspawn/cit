@@ -6,7 +6,7 @@ RSpec.describe CIT::Actions::DoomsdayMachines do
   describe 'the module' do
     subject { described_class }
 
-    it { is_expected.to respond_to(:create) }
+    it { is_expected.to respond_to(:create, :destroy) }
   end
 
   describe '.create' do
@@ -34,6 +34,32 @@ RSpec.describe CIT::Actions::DoomsdayMachines do
       let(:data) { attributes_for(:doomsday_machine, traits).except(*columns) }
       let(:traits) { { mad_scientist_id: create(:uuid) } }
       let(:columns) { %i[id created_at] }
+
+      it 'should raise Sequel::NoMatchingRow' do
+        expect { subject }.to raise_error(Sequel::NoMatchingRow)
+      end
+    end
+  end
+
+  describe '.destroy' do
+    subject { described_class.destroy(params, rest) }
+
+    let(:params) { data }
+    let(:data) { { id: id } }
+    let!(:id) { doomsday_machine.id }
+    let(:doomsday_machine) { create(:doomsday_machine) }
+    let(:rest) { nil }
+
+    it_should_behave_like 'an action parameters receiver', wrong_structure: {}
+
+    it 'should destroy record of doomsday machine with provided identifier' do
+      expect { subject }
+        .to change { CIT::Models::DoomsdayMachine.count }
+        .by(-1)
+    end
+
+    context 'when the record can\'t be found by provided identifier' do
+      let(:id) { create(:uuid) }
 
       it 'should raise Sequel::NoMatchingRow' do
         expect { subject }.to raise_error(Sequel::NoMatchingRow)

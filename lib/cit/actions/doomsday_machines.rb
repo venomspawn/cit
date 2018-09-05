@@ -19,6 +19,19 @@ module CIT
       def self.create(params, rest = nil)
         Create.new(params, rest).create
       end
+
+      require_relative 'doomsday_machines/destroy'
+
+      # Destroys record of a doomsday machine
+      # @param [Object] params
+      #   object of action parameters, which can be an associative array, a
+      #   JSON-string or an object with `#read` method
+      # @param [NilClass, Hash] rest
+      #   associative array of additional action parameters or `nil`, if
+      #   there are no additional parameters
+      def self.destroy(params, rest = nil)
+        Destroy.new(params, rest).destroy
+      end
     end
   end
 end
