@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module CIT
+  # Namespace of the models
   module Models
     # Model of a mad scientist
     # @!attribute id
